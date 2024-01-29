@@ -3,65 +3,79 @@ import { object } from "prop-types";
 const getState = ({ getStore, getActions, setStore }) => {
 	return {
 		store: {
-			demo: [
-				{
-					title: "FIRST",
-					background: "white",
-					initial: "white"
-				},
-				{
-					title: "SECOND",
-					background: "white",
-					initial: "white"
-				}
-			],
+
 			characters: [],
-			urlBase: "https://www.swapi.tech/api",
+			urlBase: "https://www.swapi.tech/api/",
+			planets: [],
+			character: {},
+			fav: [],
+			planet: {},
+
 		},
+
 		actions: {
-			// Use getActions to call a function within a fuction
-			exampleFunction: () => {
-				getActions().changeColor(0, "green");
-			},
-			loadSomeData: () => {
-				/**
-					fetch().then().then(data => setStore({ "foo": data.bar }))
-				*/
-			},
-			changeColor: (index, color) => {
-				//get the store
-				const store = getStore();
 
-				//we have to loop the entire demo array to look for the respective index
-				//and change its color
-				const demo = store.demo.map((elm, i) => {
-					if (i === index) elm.background = color;
-					return elm;
-				});
-
-				//reset the global store
-				setStore({ demo: demo });
+			favorites: (item) => {
+				const { fav } = getStore();
+				const updatedFav = fav.includes(item) ? fav.filter((element) => element !== item) : [...fav, item];
+				setStore({ fav: updatedFav });
 			},
-			getCharacter: async () => {
-				let store = getStore() 
+			
+			getCharacters: async () => {
+				const { urlBase, characters } = getStore();
 				try {
-					let response = await fetch(`${store.urlBase}/people`)
-					let data = await response.json()
-						for (let person of data.results) {
-							let responseTwo = await fetch(person.url) 
-							let dataTwo = await responseTwo.json()
-							setStore({
-								characters: [
-									...store.characters, dataTwo.result
-								]
-							})
-						}
-					console.log(data)
+					const response = await fetch(`${urlBase}/people`);
+					const data = await response.json();
+					const updatedCharacters = await Promise.all(data.results.map(async (person) => {
+						const responseTwo = await fetch(person.url);
+						const dataTwo = await responseTwo.json();
+						return dataTwo.result;
+					}));
+					setStore({ characters: [...characters, ...updatedCharacters] });
 				} catch (error) {
-					console.log(error)
+					console.error(error);
 				}
-			}
-		}
+			},
+			
+			getSingleCharacter: async (id) => {
+				const { urlBase } = getStore();
+				try {
+					const response = await fetch(`${urlBase}/people/${id}`);
+					const data = await response.json();
+					setStore({ character: data.result.properties });
+				} catch (error) {
+					console.error(error);
+				}
+			},
+			
+			getSinglePlanet: async (id) => {
+				const { urlBase } = getStore();
+				try {
+					const response = await fetch(`${urlBase}/planets/${id}`);
+					const data = await response.json();
+					setStore({ planet: data.result.properties });
+				} catch (error) {
+					console.error(error);
+				}
+			},
+			
+			getPlanets: async () => {
+				const { urlBase, planets } = getStore();
+				try {
+					const response = await fetch(`${urlBase}/planets`);
+					const data = await response.json();
+					const updatedPlanets = await Promise.all(data.results.map(async (planet) => {
+						const responseTwo = await fetch(planet.url);
+						const dataTwo = await responseTwo.json();
+						return dataTwo.result;
+					}));
+					setStore({ planets: [...planets, ...updatedPlanets] });
+				} catch (error) {
+					console.error(error);
+				}
+			},
+			
+		},
 	};
 };
 

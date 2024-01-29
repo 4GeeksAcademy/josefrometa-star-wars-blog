@@ -1,3 +1,11 @@
 /* 
     General Styles
 */
+
+.nav-bg {
+    background: black;
+}
+
+body{
+  background: rgb(17, 17, 17);  
+}

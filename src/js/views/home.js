@@ -1,33 +1,38 @@
-import React from "react";
-import "../../styles/home.css";
+import React, { useContext } from "react";
 import CharacterCard from "../component/CharacterCard.jsx";
 import PlanetCard from "../component/PlanetCard.jsx";
+import { Context } from "../store/appContext";
+import "../../styles/home.css";
+import { Link } from "react-router-dom"
 
 export const Home = () => {
+	const { store } = useContext(Context)
+	// const { actions } = useContext(Context)
 	return (
 		<>
-			<div className="container mt-5">
-				<h1 className="text-danger">Characters</h1>
+			<div className="container">
+				<h1 className="text-warning text-center">Characters</h1>
 				<div className="my-carrousel">
-					<CharacterCard />
-					<CharacterCard />
-					<CharacterCard />
-					<CharacterCard />
-					<CharacterCard />
-					<CharacterCard />
-					<CharacterCard />
+					{
+						store.characters.map((person) => {
+							return (
+								<CharacterCard key={person._id} person={person} />
+							)
+						})
+					}
+
 				</div>
 			</div>
-
-			<div className="container mt-5">
-				<h1 className="text-danger">Planets</h1>
+			<div className="container mt-5 text-center">
+				<h1 className="text-warning">Planets</h1>
 				<div className="my-carrousel">
-					<PlanetCard />
-					<PlanetCard />
-					<PlanetCard />
-					<PlanetCard />
-					<PlanetCard />
-					<PlanetCard />
+					{
+						store.planets.map((planets) => {
+							return (
+								<PlanetCard key={planets._id} planets={planets} />
+							)
+						})
+					}
 				</div>
 			</div>
 		</>
